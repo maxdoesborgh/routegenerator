@@ -1,24 +1,10 @@
-import express from "express";
-import { Graph } from "graphlib";
-import dijkstra from "dijkstrajs";
+import { importFromCSV } from "./utils/importer.js";
+import { buildGraph } from "./utils/graphBuilder.js";
+import { findRoutes } from "./algorithms/pathfinder.js";
 
-const app = express();
-app.use(express.json());
+const data = importFromCSV("data/nodes.csv", "data/edges.csv");
+const graph = buildGraph(data);
+const routes = findRoutes(graph, data.entry, data.exit);
 
-// eenvoudige testgraaf
-const graph = {
-  A: { B: 5, C: 10 },
-  B: { A: 5, C: 3 },
-  C: { A: 10, B: 3 }
-};
-
-app.get("/", (req, res) => {
-  res.send("Routegenerator actief");
-});
-
-app.get("/route", (req, res) => {
-  const path = dijkstra.find_path(graph, "A", "C");
-  res.json({ path });
-});
-
-app.listen(3000, "0.0.0.0", () => console.log("Server draait op poort 3000"));
+console.log("=== Route-opties ===");
+console.log(routes);
